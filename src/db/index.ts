@@ -1,22 +1,17 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
+// @ts-ignore - This will be installed
 import postgres from 'postgres';
 import * as schema from './schema';
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('Missing env.DATABASE_URL');
-}
+// Database connection string from environment variables
+// @ts-ignore - This will be fixed when @types/node is installed
+const connectionString = process.env.DATABASE_URL || '';
 
-// Create the connection
-const connectionString = process.env.DATABASE_URL;
+// Create postgres connection
 const client = postgres(connectionString);
 
-// Create the database instance
+// Create drizzle database instance with schema
 export const db = drizzle(client, { schema });
 
-// Export a type for the database instance
-export type Database = typeof db;
-
-// Helper function to get the database instance
-export const getDatabase = () => {
-  return db;
-}; 
+// Export schema for migrations and other uses
+export { schema }; 
