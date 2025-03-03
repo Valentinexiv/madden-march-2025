@@ -15,7 +15,7 @@ CREATE TABLE "games" (
 --> statement-breakpoint
 CREATE TABLE "standings" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"league_id" integer,
+	"league_id" uuid,
 	"team_id" varchar(20),
 	"week_index" integer,
 	"season_index" integer,
@@ -140,8 +140,8 @@ CREATE TABLE "subscriptions" (
 --> statement-breakpoint
 CREATE TABLE "weekly_defensive_stats" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"league_id" integer,
-	"player_id" integer,
+	"league_id" uuid,
+	"player_id" uuid,
 	"stat_id" varchar(20),
 	"schedule_id" varchar(20),
 	"week_index" integer,
@@ -165,8 +165,8 @@ CREATE TABLE "weekly_defensive_stats" (
 --> statement-breakpoint
 CREATE TABLE "weekly_kicking_stats" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"league_id" integer,
-	"player_id" integer,
+	"league_id" uuid,
+	"player_id" uuid,
 	"stat_id" varchar(20),
 	"schedule_id" varchar(20),
 	"week_index" integer,

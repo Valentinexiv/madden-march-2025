@@ -1,3 +1,4 @@
+ALTER TABLE "standings" ALTER COLUMN "league_id" SET DATA TYPE uuid;--> statement-breakpoint
 ALTER TABLE "weekly_defensive_stats" ALTER COLUMN "league_id" SET DATA TYPE uuid;--> statement-breakpoint
 ALTER TABLE "weekly_defensive_stats" ALTER COLUMN "player_id" SET DATA TYPE uuid;--> statement-breakpoint
 ALTER TABLE "weekly_kicking_stats" ALTER COLUMN "league_id" SET DATA TYPE uuid;--> statement-breakpoint

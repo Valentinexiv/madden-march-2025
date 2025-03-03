@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node -r dotenv/config src/db/migrate.js",
+    "db:fix": "node -r dotenv/config src/db/fix-migration.js",
+    "db:reset": "node -r dotenv/config src/db/reset-db.js",
+    "db:fresh": "node -r dotenv/config src/db/migrate-fresh.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

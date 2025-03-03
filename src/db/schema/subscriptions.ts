@@ -1,15 +1,12 @@
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { users } from './users';
-
-// Subscriptions table
-export const subscriptions = pgTable('subscriptions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => users.id).notNull(),
-  stripeCustomerId: text('stripe_customer_id').notNull(),
-  stripeSubscriptionId: text('stripe_subscription_id').notNull(),
-  status: text('status').notNull(),
-  plan: text('plan').notNull(),
-  currentPeriodEnd: timestamp('current_period_end').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-}); 
+// File: src/db/schema/subscriptions.ts
+export interface Subscription {
+  id: string; // UUID
+  user_id: string; // UUID foreign key to users.id
+  stripe_customer_id: string;
+  stripe_subscription_id: string;
+  status: string;
+  plan: string;
+  current_period_end: Date;
+  created_at: Date;
+  updated_at: Date;
+}

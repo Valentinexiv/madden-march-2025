@@ -1,14 +1,12 @@
-// Re-export all schema components
 export * from './users';
 export * from './leagues';
 export * from './teams';
 export * from './players';
-export * from './games';
-export * from './integrations';
-export * from './subscriptions';
-export * from './weekly_stats';
+export * from './player_ratings';
+export * from './player_traits';
+export * from './player_abilities';
+export * from './player_ability_slots';
 export * from './schedule';
-
-// Import and re-export with a different name to avoid conflicts
-import { standings as detailedStandings, standingsRelations } from './standings';
-export { detailedStandings, standingsRelations }; 
+export * from './weekly_stats';
+export * from './standings';
+export * from './subscriptions';
