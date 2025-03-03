@@ -9,10 +9,8 @@ type AuthContextType = {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string) => Promise<{ error: Error | null, user: User | null }>;
+  signInWithDiscord: () => Promise<void>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: Error | null }>;
 };
 
 // Create the auth context with default values
@@ -62,29 +60,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     initializeAuth();
   }, []);
 
-  // Sign in with email and password
-  const signIn = async (email: string, password: string) => {
+  // Sign in with Discord OAuth
+  const signInWithDiscord = async () => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      await supabase.auth.signInWithOAuth({
+        provider: 'discord',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          scopes: 'identify email guilds',
+        },
       });
-      return { error };
     } catch (error) {
-      return { error: error as Error };
-    }
-  };
-
-  // Sign up with email and password
-  const signUp = async (email: string, password: string) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-      return { error, user: data.user };
-    } catch (error) {
-      return { error: error as Error, user: null };
+      console.error('Error signing in with Discord:', error);
     }
   };
 
@@ -93,27 +80,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await supabase.auth.signOut();
   };
 
-  // Reset password
-  const resetPassword = async (email: string) => {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-      return { error };
-    } catch (error) {
-      return { error: error as Error };
-    }
-  };
-
   // Create the context value
   const value = {
     user,
     session,
     isLoading,
-    signIn,
-    signUp,
+    signInWithDiscord,
     signOut,
-    resetPassword,
   };
 
   // Provide the auth context to children

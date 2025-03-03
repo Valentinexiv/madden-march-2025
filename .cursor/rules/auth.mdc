@@ -1,0 +1,11 @@
+---
+description: Follow these rules when working on auth.
+globs: 
+alwaysApply: false
+---
+
+### Auth Rules
+
+Follow these rules when working on auth.
+
+It uses Supabase for authentication.
