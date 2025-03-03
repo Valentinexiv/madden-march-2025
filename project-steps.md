@@ -114,7 +114,7 @@
   - **User Instructions**: None
 
 ## UI Framework
-- [ ] Step 13: Set up Shadcn UI
+- [x] Step 13: Set up Shadcn UI
   - **Task**: Install and configure Shadcn UI components
   - **Files**:
     - `components.json`: Shadcn configuration
@@ -122,7 +122,7 @@
   - **Step Dependencies**: Step 3
   - **User Instructions**: Run `npx shadcn-ui@latest init` and follow the prompts
 
-- [ ] Step 14: Install essential UI components
+- [x] Step 14: Install essential UI components
   - **Task**: Add core Shadcn UI components
   - **Files**:
     - `src/components/ui`: Component directory
@@ -132,13 +132,13 @@
     npx shadcn-ui@latest add button card form input toast dialog dropdown-menu avatar alert
     ```
 
-- [ ] Step 15: Create layout components
+- [x] Step 15: Create layout components
   - **Task**: Build reusable layout components
   - **Files**:
     - `src/components/layout/navbar.tsx`: Main navigation component
     - `src/components/layout/sidebar.tsx`: Sidebar navigation
     - `src/components/layout/page-header.tsx`: Page headers
-    - `src/app/(dashboard)/layout.tsx`: Dashboard layout
+    - `src/app/dashboard/layout.tsx`: Dashboard layout
   - **Step Dependencies**: Step 14
   - **User Instructions**: None
 
