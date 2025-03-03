@@ -1,13 +1,11 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 // Create a Supabase client for server components
-export const createServerClient = () => {
-  const cookieStore = cookies();
-  
+const createServerSupabase = () => {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -17,44 +15,74 @@ export const createServerClient = () => {
       },
       global: {
         headers: {
-          cookie: cookieStore.toString(),
+          cookie: cookies().toString(),
         },
       },
     }
   );
 };
 
-// Check if the user is authenticated on the server
+/**
+ * Get the current session from Supabase on the server
+ * @returns The current session or null if not authenticated
+ */
 export async function getServerSession() {
-  const supabase = createServerClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  return session;
+  try {
+    const supabase = createServerSupabase();
+    const { data, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error('Error getting session:', error);
+      return null;
+    }
+    
+    return data.session;
+  } catch (error) {
+    console.error('Error in getServerSession:', error);
+    return null;
+  }
 }
 
-// Get the current user on the server
+/**
+ * Get the current user from Supabase on the server
+ * @returns The current user or null if not authenticated
+ */
 export async function getServerUser() {
   const session = await getServerSession();
-  return session?.user ?? null;
+  return session?.user || null;
 }
 
-// Redirect if not authenticated
+/**
+ * Check if the user is authenticated on the server
+ * @returns True if authenticated, false otherwise
+ */
+export async function isAuthenticated() {
+  const session = await getServerSession();
+  return !!session;
+}
+
+/**
+ * Require authentication for a server component
+ * If not authenticated, redirect to the sign-in page
+ * @param redirectTo The path to redirect to if not authenticated
+ */
 export async function requireAuth(redirectTo: string = '/sign-in') {
-  const session = await getServerSession();
+  const authenticated = await isAuthenticated();
   
-  if (!session) {
+  if (!authenticated) {
     redirect(redirectTo);
   }
-  
-  return session.user;
 }
 
-// Redirect if already authenticated
-export async function requireGuest(redirectTo: string = '/dashboard') {
-  const session = await getServerSession();
+/**
+ * Redirect if already authenticated
+ * Useful for sign-in/sign-up pages
+ * @param redirectTo The path to redirect to if authenticated
+ */
+export async function redirectIfAuthenticated(redirectTo: string = '/dashboard') {
+  const authenticated = await isAuthenticated();
   
-  if (session) {
+  if (authenticated) {
     redirect(redirectTo);
   }
-  
-  return null;
 } 
