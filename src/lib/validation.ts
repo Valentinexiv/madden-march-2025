@@ -1,29 +1,27 @@
 /**
  * Validation Utilities
  * 
- * This file contains utilities for validating API requests using Zod.
- * It provides a consistent way to validate and parse request data,
- * ensuring type safety and proper error handling.
+ * This file contains utility functions for validating request data.
  */
 
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { HttpErrors } from './api-response';
+import { HttpErrors } from '@/lib/api-response';
 
 /**
- * Validates and parses request body using a Zod schema
+ * Validate request body against a Zod schema
  * 
- * @param request - The Next.js request object
- * @param schema - Zod schema to validate against
- * @returns Parsed and validated data
+ * @param req - The Next.js request object
+ * @param schema - The Zod schema to validate against
+ * @returns The validated data
  * @throws HttpError if validation fails
  */
 export async function validateBody<T extends z.ZodType>(
-  request: NextRequest,
+  req: NextRequest,
   schema: T
 ): Promise<z.infer<T>> {
   try {
-    const body = await request.json();
+    const body = await req.json();
     return schema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -31,13 +29,44 @@ export async function validateBody<T extends z.ZodType>(
         statusCode: 400,
         code: 'VALIDATION_ERROR',
         message: 'Invalid request data',
-        details: formatZodError(error)
+        details: error.format(),
       };
     }
     throw {
       statusCode: 400,
       code: 'INVALID_JSON',
-      message: 'Invalid JSON in request body'
+      message: 'Invalid JSON in request body',
+    };
+  }
+}
+
+/**
+ * Validate route parameters against a Zod schema
+ * 
+ * @param params - The route parameters
+ * @param schema - The Zod schema to validate against
+ * @returns The validated parameters
+ * @throws HttpError if validation fails
+ */
+export function validateParams<T extends z.ZodType>(
+  params: Record<string, string>,
+  schema: T
+): z.infer<T> {
+  try {
+    return schema.parse(params);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      throw {
+        statusCode: 400,
+        code: 'VALIDATION_ERROR',
+        message: 'Invalid route parameters',
+        details: error.format(),
+      };
+    }
+    throw {
+      statusCode: 400,
+      code: 'INVALID_PARAMS',
+      message: 'Invalid route parameters',
     };
   }
 }
@@ -76,37 +105,6 @@ export function validateQuery<T extends z.ZodType>(
       statusCode: 400,
       code: 'INVALID_QUERY',
       message: 'Invalid query parameters'
-    };
-  }
-}
-
-/**
- * Validates and parses URL path parameters using a Zod schema
- * 
- * @param params - The route parameters object
- * @param schema - Zod schema to validate against
- * @returns Parsed and validated data
- * @throws HttpError if validation fails
- */
-export function validateParams<T extends z.ZodType>(
-  params: Record<string, string | string[]>,
-  schema: T
-): z.infer<T> {
-  try {
-    return schema.parse(params);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      throw {
-        statusCode: 400,
-        code: 'VALIDATION_ERROR',
-        message: 'Invalid path parameters',
-        details: formatZodError(error)
-      };
-    }
-    throw {
-      statusCode: 400,
-      code: 'INVALID_PARAMS',
-      message: 'Invalid path parameters'
     };
   }
 }

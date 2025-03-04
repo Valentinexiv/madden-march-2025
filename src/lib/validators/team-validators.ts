@@ -29,27 +29,30 @@ export const MaddenTeamSchema = z.object({
 });
 
 /**
- * Schema for validating the league teams payload from the Madden Companion App
+ * Schema for validating the payload from the Madden Companion App
  */
 export const LeagueTeamsPayloadSchema = z.object({
   leagueTeamInfoList: z.array(MaddenTeamSchema),
 });
 
 /**
- * Type definition for a validated Madden team
+ * Type for a validated Madden team
  */
 export type MaddenTeam = z.infer<typeof MaddenTeamSchema>;
 
 /**
- * Type definition for a validated league teams payload
+ * Type for a validated league teams payload
  */
 export type LeagueTeamsPayload = z.infer<typeof LeagueTeamsPayloadSchema>;
 
 /**
- * Schema for validating route parameters for the league teams API endpoint
+ * Schema for validating route parameters
  */
 export const LeagueTeamsParamsSchema = z.object({
-  userId: z.string().uuid('Invalid user ID format'),
-  platform: z.string().min(1, 'Platform is required'),
-  leagueId: z.string().uuid('Invalid league ID format'),
-}); 
+  leagueSlug: z.string().min(1, 'League slug is required'),
+});
+
+/**
+ * Type for validated route parameters
+ */
+export type LeagueTeamsParams = z.infer<typeof LeagueTeamsParamsSchema>; 

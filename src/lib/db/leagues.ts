@@ -31,6 +31,29 @@ export async function getLeagueById(id: string): Promise<League | null> {
 }
 
 /**
+ * Get a league by its slug
+ * 
+ * @param slug - The unique slug for the league
+ * @returns The league or null if not found
+ */
+export async function getLeagueBySlug(slug: string): Promise<League | null> {
+  const { data, error } = await supabaseAdmin
+    .from('leagues')
+    .select('*')
+    .eq('league_identifier', slug)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') {
+      return null; // Not found
+    }
+    throw error;
+  }
+  
+  return data as League;
+}
+
+/**
  * Get leagues by user ID
  * 
  * @param userId - The UUID of the user
@@ -168,4 +191,169 @@ export async function userHasLeagueAccess(userId: string, leagueId: string): Pro
     .single();
   
   return !!member;
+}
+
+/**
+ * Delete a league by its ID
+ * 
+ * @param id - The UUID of the league to delete
+ * @returns True if the league was deleted successfully
+ */
+export async function deleteLeague(id: string): Promise<boolean> {
+  const { error } = await supabaseAdmin
+    .from('leagues')
+    .delete()
+    .eq('id', id);
+  
+  if (error) {
+    throw error;
+  }
+  
+  return true;
+}
+
+/**
+ * Check if a league identifier is available
+ * 
+ * @param identifier - The league identifier to check
+ * @returns True if the identifier is available, false if it's already taken
+ */
+export async function isLeagueIdentifierAvailable(identifier: string): Promise<boolean> {
+  const { data, error } = await supabaseAdmin
+    .from('leagues')
+    .select('id')
+    .eq('league_identifier', identifier)
+    .maybeSingle();
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data === null;
+}
+
+/**
+ * Get league members
+ * 
+ * @param leagueId - The UUID of the league
+ * @returns Array of league members
+ */
+export async function getLeagueMembers(leagueId: string): Promise<any[]> {
+  const { data, error } = await supabaseAdmin
+    .from('league_members')
+    .select(`
+      *,
+      users:user_id (
+        id,
+        email,
+        user_metadata
+      )
+    `)
+    .eq('league_id', leagueId);
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data;
+}
+
+/**
+ * Add a member to a league
+ * 
+ * @param leagueId - The UUID of the league
+ * @param userId - The UUID of the user
+ * @param role - The role of the user in the league
+ * @returns The created league member
+ */
+export async function addLeagueMember(leagueId: string, userId: string, role: string): Promise<any> {
+  const { data, error } = await supabaseAdmin
+    .from('league_members')
+    .insert({
+      league_id: leagueId,
+      user_id: userId,
+      role: role
+    })
+    .select()
+    .single();
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data;
+}
+
+/**
+ * Remove a member from a league
+ * 
+ * @param leagueId - The UUID of the league
+ * @param userId - The UUID of the user
+ * @returns True if the member was removed successfully
+ */
+export async function removeLeagueMember(leagueId: string, userId: string): Promise<boolean> {
+  const { error } = await supabaseAdmin
+    .from('league_members')
+    .delete()
+    .eq('league_id', leagueId)
+    .eq('user_id', userId);
+  
+  if (error) {
+    throw error;
+  }
+  
+  return true;
+}
+
+/**
+ * Update a league member's role
+ * 
+ * @param leagueId - The UUID of the league
+ * @param userId - The UUID of the user
+ * @param role - The new role of the user in the league
+ * @returns The updated league member
+ */
+export async function updateLeagueMemberRole(leagueId: string, userId: string, role: string): Promise<any> {
+  const { data, error } = await supabaseAdmin
+    .from('league_members')
+    .update({ role })
+    .eq('league_id', leagueId)
+    .eq('user_id', userId)
+    .select()
+    .single();
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data;
+}
+
+/**
+ * Get leagues where the user is a member
+ * 
+ * @param userId - The UUID of the user
+ * @returns Array of league memberships with league data
+ */
+export async function getLeaguesMembershipsByUserId(userId: string): Promise<Array<{
+  league: League;
+  role: string;
+}>> {
+  const { data, error } = await supabaseAdmin
+    .from('league_members')
+    .select(`
+      role,
+      leagues:league_id (*)
+    `)
+    .eq('user_id', userId);
+  
+  if (error) {
+    throw error;
+  }
+  
+  // Transform the data to match the expected format
+  return data.map((item: any) => ({
+    league: item.leagues as League,
+    role: item.role
+  }));
 } 

@@ -143,7 +143,7 @@
   - **User Instructions**: None
 
 ## API Routes
-- [ ] Step 16: Create base API utilities
+- [x] Step 16: Create base API utilities
   - **Task**: Set up common API utilities and error handling
   - **Files**:
     - `src/lib/api-response.ts`: API response utilities
@@ -151,7 +151,7 @@
   - **Step Dependencies**: Step 7
   - **User Instructions**: None
 
-- [ ] Step 17: Create League Teams API endpoint
+- [x] Step 17: Create League Teams API endpoint
   - **Task**: Implement API endpoint for receiving league teams data
   - **Files**:
     - `src/app/api/[userId]/[platform]/[leagueId]/leagueteams/route.ts`: API route
@@ -159,7 +159,7 @@
   - **Step Dependencies**: Step 16
   - **User Instructions**: None
 
-- [ ] Step 18: Create Standings API endpoint
+- [x] Step 18: Create Standings API endpoint
   - **Task**: Implement API endpoint for receiving standings data
   - **Files**:
     - `src/app/api/[userId]/[platform]/[leagueId]/standings/route.ts`: API route
@@ -167,7 +167,7 @@
   - **Step Dependencies**: Step 16
   - **User Instructions**: None
 
-- [ ] Step 19: Create Team Roster API endpoint
+- [x] Step 19: Create Team Roster API endpoint
   - **Task**: Implement API endpoint for receiving roster data
   - **Files**:
     - `src/app/api/[userId]/[platform]/[leagueId]/team/[teamId]/roster/route.ts`: API route
@@ -175,7 +175,7 @@
   - **Step Dependencies**: Step 16
   - **User Instructions**: None
 
-- [ ] Step 20: Create Weekly Stats API endpoint
+- [x] Step 20: Create Weekly Stats API endpoint
   - **Task**: Implement API endpoint for receiving weekly stats
   - **Files**:
     - `src/app/api/[userId]/[platform]/[leagueId]/week/[weekType]/[weekNumber]/[dataType]/route.ts`: API route
@@ -183,7 +183,7 @@
   - **Step Dependencies**: Step 16
   - **User Instructions**: None
 
-- [ ] Step 21: Create Free Agents API endpoint
+- [x] Step 21: Create Free Agents API endpoint
   - **Task**: Implement API endpoint for receiving free agents data
   - **Files**:
     - `src/app/api/[userId]/[platform]/[leagueId]/freeagents/roster/route.ts`: API route
@@ -200,7 +200,7 @@
   - **Step Dependencies**: Step 7, Step 16
   - **User Instructions**: None
 
-- [ ] Step 23: Implement database transaction utility
+- [x] Step 23: Implement database transaction utility
   - **Task**: Create utility for handling database transactions
   - **Files**:
     - `src/lib/db-transaction.ts`: Transaction utility
@@ -208,14 +208,14 @@
   - **User Instructions**: None
 
 ## League Management
-- [ ] Step 24: Create league creation functionality
+- [x] Step 24: Create league creation functionality
   - **Task**: Implement database operations for creating leagues
   - **Files**:
     - `src/lib/actions/league-actions.ts`: League CRUD operations
   - **Step Dependencies**: Step 7
   - **User Instructions**: None
 
-- [ ] Step 25: Build League setup form
+- [x] Step 25: Build League setup form
   - **Task**: Create form for league setup
   - **Files**:
     - `src/components/leagues/league-form.tsx`: League creation form
@@ -223,19 +223,19 @@
   - **Step Dependencies**: Step 14, Step 24
   - **User Instructions**: None
 
-- [ ] Step 26: Create league settings page
+- [x] Step 26: Create league settings page
   - **Task**: Create UI for managing league settings
   - **Files**:
-    - `src/app/(dashboard)/leagues/[leagueId]/settings/page.tsx`: Settings page
+    - `src/app/dashboard/leagues/[leagueId]/settings/page.tsx`: Settings page
     - `src/components/leagues/league-settings.tsx`: Settings components
   - **Step Dependencies**: Step 25
   - **User Instructions**: None
 
 ## Dashboard Features
-- [ ] Step 27: Implement league list and creation page
+- [x] Step 27: Implement league list and creation page
   - **Task**: Create main page for listing and creating leagues
   - **Files**:
-    - `src/app/(dashboard)/leagues/page.tsx`: Leagues list page
+    - `src/app/dashboard/leagues/page.tsx`: Leagues list page
     - `src/components/leagues/league-card.tsx`: League card component
     - `src/components/leagues/create-league-button.tsx`: Create league button
   - **Step Dependencies**: Step 24, Step 25
@@ -244,7 +244,7 @@
 - [ ] Step 28: Create league dashboard page
   - **Task**: Create main dashboard page for a league
   - **Files**:
-    - `src/app/(dashboard)/leagues/[leagueId]/page.tsx`: League dashboard
+    - `src/app/dashboard/leagues/[leagueId]/page.tsx`: League dashboard
     - `src/components/leagues/league-header.tsx`: League header component
     - `src/components/leagues/league-stats-summary.tsx`: Stats summary component
   - **Step Dependencies**: Step 27
@@ -253,7 +253,7 @@
 - [ ] Step 29: Build teams overview page
   - **Task**: Create page showing all teams in a league
   - **Files**:
-    - `src/app/(dashboard)/leagues/[leagueId]/teams/page.tsx`: Teams list page
+    - `src/app/dashboard/leagues/[leagueId]/teams/page.tsx`: Teams list page
     - `src/components/teams/team-card.tsx`: Team card component
     - `src/components/teams/teams-list.tsx`: Teams list component
   - **Step Dependencies**: Step 28
@@ -262,7 +262,7 @@
 - [ ] Step 30: Create team detail page
   - **Task**: Create page showing detailed team information
   - **Files**:
-    - `src/app/(dashboard)/leagues/[leagueId]/teams/[teamId]/page.tsx`: Team page
+    - `src/app/dashboard/leagues/[leagueId]/teams/[teamId]/page.tsx`: Team page
     - `src/components/teams/team-header.tsx`: Team header component
     - `src/components/teams/team-stats.tsx`: Team stats component
   - **Step Dependencies**: Step 29
@@ -271,7 +271,7 @@
 - [ ] Step 31: Implement roster page
   - **Task**: Create page showing team roster
   - **Files**:
-    - `src/app/(dashboard)/leagues/[leagueId]/teams/[teamId]/roster/page.tsx`: Roster page
+    - `src/app/dashboard/leagues/[leagueId]/teams/[teamId]/roster/page.tsx`: Roster page
     - `src/components/players/player-card.tsx`: Player card component
     - `src/components/players/roster-table.tsx`: Roster table component
   - **Step Dependencies**: Step 30
@@ -280,7 +280,7 @@
 - [ ] Step 32: Create player detail page
   - **Task**: Create page showing detailed player information
   - **Files**:
-    - `src/app/(dashboard)/leagues/[leagueId]/players/[playerId]/page.tsx`: Player page
+    - `src/app/dashboard/leagues/[leagueId]/players/[playerId]/page.tsx`: Player page
     - `src/components/players/player-header.tsx`: Player header component
     - `src/components/players/player-stats.tsx`: Player stats component
     - `src/components/players/player-ratings.tsx`: Player ratings component
@@ -290,7 +290,7 @@
 - [ ] Step 33: Implement standings page
   - **Task**: Create page showing league standings
   - **Files**:
-    - `src/app/(dashboard)/leagues/[leagueId]/standings/page.tsx`: Standings page
+    - `src/app/dashboard/leagues/[leagueId]/standings/page.tsx`: Standings page
     - `src/components/standings/standings-table.tsx`: Standings table component
   - **Step Dependencies**: Step 28
   - **User Instructions**: None
@@ -298,7 +298,7 @@
 - [ ] Step 34: Create schedule page
   - **Task**: Create page showing league schedule and game results
   - **Files**:
-    - `src/app/(dashboard)/leagues/[leagueId]/schedule/page.tsx`: Schedule page
+    - `src/app/dashboard/leagues/[leagueId]/schedule/page.tsx`: Schedule page
     - `src/components/schedule/schedule-list.tsx`: Schedule list component
     - `src/components/schedule/game-card.tsx`: Game card component
   - **Step Dependencies**: Step 28
@@ -325,7 +325,7 @@
 - [ ] Step 37: Create player comparison feature
   - **Task**: Implement feature to compare players side by side
   - **Files**:
-    - `src/app/(dashboard)/leagues/[leagueId]/players/compare/page.tsx`: Comparison page
+    - `src/app/dashboard/leagues/[leagueId]/players/compare/page.tsx`: Comparison page
     - `src/components/players/player-comparison.tsx`: Player comparison component
     - `src/components/players/player-selector.tsx`: Player selector component
   - **Step Dependencies**: Step 32, Step 35
@@ -334,7 +334,7 @@
 - [ ] Step 38: Create league import instructions
   - **Task**: Create page with instructions for importing league data
   - **Files**:
-    - `src/app/(dashboard)/leagues/[leagueId]/import/page.tsx`: Import page
+    - `src/app/dashboard/leagues/[leagueId]/import/page.tsx`: Import page
     - `src/components/leagues/import-instructions.tsx`: Instructions component
     - `src/components/leagues/url-generator.tsx`: URL generator component
   - **Step Dependencies**: Step 26
@@ -354,7 +354,7 @@
   - **Task**: Build UI for selecting Discord servers
   - **Files**:
     - `src/components/discord/server-selector.tsx`: Server selector component
-    - `src/app/(dashboard)/leagues/[leagueId]/discord/page.tsx`: Discord setup page
+    - `src/app/dashboard/leagues/[leagueId]/discord/page.tsx`: Discord setup page
   - **Step Dependencies**: Step 39
   - **User Instructions**: None
 
