@@ -49,7 +49,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main content area with sidebar */}
       <div className="flex flex-1">
         {/* Sidebar */}
-        <Sidebar />
+        <Sidebar className="" />
         
         {/* Main content with padding for sidebar */}
         <main className="flex-1 md:ml-72">

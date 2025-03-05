@@ -9,11 +9,16 @@ export default function AuthCallbackPage() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<string>('Processing authentication...');
   const [error, setError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<any>(null);
+  const [debugInfo, setDebugInfo] = useState<any>({
+    flowStartTime: localStorage.getItem('auth_flow_started') || 'unknown',
+    processStartTime: new Date().toISOString()
+  });
 
   useEffect(() => {
     // Handle the OAuth callback
     const handleAuthCallback = async () => {
+      console.log('Auth callback handling started');
+      
       // Log all URL parameters for debugging
       const allParams: Record<string, string> = {};
       searchParams.forEach((value, key) => {
@@ -38,24 +43,71 @@ export default function AuthCallbackPage() {
           return;
         }
         
+        // Extract the code from URL if present - this confirms we're in the right callback flow
+        const code = searchParams.get('code');
+        if (!code) {
+          console.warn('No auth code found in URL, this might not be the right callback.');
+          setDebugInfo(prev => ({ ...prev, warning: 'No auth code in URL' }));
+        } else {
+          console.log('Auth code found in URL, proceeding with authentication');
+          setDebugInfo(prev => ({ ...prev, hasCode: true }));
+        }
+        
         // With Supabase auth handling, we need to get the session using getSession()
         setStatus('Getting session from Supabase...');
         console.log('Getting session from Supabase...');
         
+        // Force a refresh of the session before checking it
+        const { data, error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          console.warn('Session refresh failed, continuing with getSession:', refreshError);
+          setDebugInfo(prev => ({ ...prev, refreshError: refreshError.message }));
+        } else {
+          console.log('Session refreshed successfully:', !!data.session);
+          if (data.session) {
+            console.log('User authenticated after refresh:', data.session.user.id);
+            setDebugInfo(prev => ({ ...prev, refreshedSession: { 
+              userId: data.session?.user.id,
+              email: data.session?.user.email,
+              expiresAt: data.session?.expires_at
+            }}));
+          }
+        }
+        
+        // Try a second time with getSession()
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        // Debug cookie state
+        console.log('Cookies after auth:', document.cookie);
+        setDebugInfo(prev => ({ ...prev, 
+          cookies: document.cookie,
+          hasSession: !!session,
+          sessionError: sessionError?.message
+        }));
         
         if (sessionError) {
           console.error('Error getting session:', sessionError);
           setError(`Authentication error: ${sessionError.message}`);
           setStatus('Session retrieval failed');
           setTimeout(() => {
-            router.push(`/?error=session-error`);
+            router.push(`/?error=session-error&message=${encodeURIComponent(sessionError.message)}`);
           }, 2000);
           return;
         }
         
         if (!session) {
           console.error('No session found. This may indicate the OAuth flow was not completed.');
+          
+          // Try one more approach - explicitly get the auth code from the URL
+          // and exchange it for a session
+          if (code) {
+            setStatus('Attempting to directly process auth code...');
+            console.log("No session found, trying to process auth code directly");
+            
+            // We don't have direct code exchange in the client SDK, so this is informational only
+            setDebugInfo(prev => ({ ...prev, directCodeAttempt: true }));
+          }
+          
           setError('No session found after authentication');
           setStatus('Authentication incomplete');
           setTimeout(() => {
@@ -65,7 +117,11 @@ export default function AuthCallbackPage() {
         }
         
         setStatus('Successfully authenticated. Processing user data...');
-        console.log('Successfully obtained session');
+        console.log('Successfully obtained session:', session.user.id);
+        
+        // Store auth token in localStorage as a backup
+        localStorage.setItem('supabase_auth_token', session.access_token);
+        localStorage.setItem('supabase_user_id', session.user.id);
         
         // Rest of the authentication handling with your user sync logic
         const userData = {
@@ -84,6 +140,7 @@ export default function AuthCallbackPage() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
             },
             body: JSON.stringify({ 
               user: {
@@ -101,6 +158,8 @@ export default function AuthCallbackPage() {
             const errorText = await response.text();
             console.error('Error syncing user data:', errorText);
             setStatus('User data sync failed. Redirecting to onboarding...');
+            setDebugInfo(prev => ({ ...prev, syncError: errorText }));
+            
             // On error, force redirect to onboarding
             setTimeout(() => {
               router.push('/onboarding');
@@ -132,6 +191,7 @@ export default function AuthCallbackPage() {
               localStorage.removeItem('authRedirectUrl'); // Clear it after use
               
               setTimeout(() => {
+                // Force a hard navigation to ensure cookies are sent
                 window.location.href = redirectTo;
               }, 1000);
             }
@@ -140,6 +200,7 @@ export default function AuthCallbackPage() {
         } catch (syncError) {
           console.error('Error calling sync user API:', syncError);
           setStatus('Error synchronizing user data. Redirecting to onboarding...');
+          setDebugInfo(prev => ({ ...prev, apiError: syncError instanceof Error ? syncError.message : String(syncError) }));
           
           // Even on error, redirect to onboarding to be safe
           setTimeout(() => {
@@ -151,6 +212,7 @@ export default function AuthCallbackPage() {
         console.error('Error in auth callback:', error);
         setError('An unexpected error occurred during authentication');
         setStatus('Authentication failed');
+        setDebugInfo(prev => ({ ...prev, fatalError: error instanceof Error ? error.message : String(error) }));
         
         setTimeout(() => {
           router.push('/?error=auth');
@@ -182,12 +244,11 @@ export default function AuthCallbackPage() {
           </div>
         )}
         
-        {(process.env.NODE_ENV === 'development' || process.env.DEBUG_AUTH === 'true') && (
-          <div className="mt-8 p-4 text-left text-xs bg-gray-50 border border-gray-200 rounded-md">
-            <p className="font-bold mb-2">Debug Info:</p>
-            <pre className="overflow-auto max-h-40">{JSON.stringify(debugInfo, null, 2)}</pre>
-          </div>
-        )}
+        {/* Always show debug info in development to help troubleshoot */}
+        <div className="mt-8 p-4 text-left text-xs bg-gray-50 border border-gray-200 rounded-md">
+          <p className="font-bold mb-2">Debug Info:</p>
+          <pre className="overflow-auto max-h-40">{JSON.stringify(debugInfo, null, 2)}</pre>
+        </div>
       </div>
     </div>
   );

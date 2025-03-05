@@ -17,14 +17,23 @@ export function useDiscordAuth() {
       const urlParams = new URLSearchParams(window.location.search);
       const redirectParam = urlParams.get('redirect');
       if (redirectParam) {
+        console.log(`Saving redirect URL: ${redirectParam}`);
         localStorage.setItem('authRedirectUrl', redirectParam);
       }
 
+      // Clear any existing error params from the URL before sign in
+      if (urlParams.has('error')) {
+        console.log('Clearing error parameters before sign in');
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('error');
+        window.history.replaceState({}, '', newUrl);
+      }
+
+      console.log('Initiating Discord sign in');
       await signInWithDiscord();
       // Note: The actual redirect is handled by Supabase OAuth flow
     } catch (err) {
       console.error('Error initiating Discord sign in:', err);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -45,12 +54,20 @@ export function useSignOut() {
     setIsLoading(true);
 
     try {
+      console.log('Starting sign out process');
       await signOut();
-      // Redirect after sign out
-      router.push(redirectTo);
+      
+      // Clear any stored auth data
+      localStorage.removeItem('authRedirectUrl');
+      localStorage.removeItem('supabase_auth_token');
+      localStorage.removeItem('supabase_user_id');
+      
+      console.log(`Redirecting to ${redirectTo} after sign out`);
+      
+      // Force a full page reload to clear any state
+      window.location.href = redirectTo;
     } catch (error) {
       console.error('Error signing out:', error);
-    } finally {
       setIsLoading(false);
     }
   };

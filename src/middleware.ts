@@ -1,4 +1,4 @@
-import { createServerClient } from '@supabase/ssr';
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -33,49 +33,30 @@ const publicRoutes = [
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   
-  // Create a Supabase client
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return req.cookies.get(name)?.value;
-        },
-        set(name: string, value: string, options: any) {
-          req.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-          res.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-        },
-        remove(name: string, options: any) {
-          req.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
-          res.cookies.set({
-            name,
-            value: '',
-            ...options,
-          });
-        },
-      },
-    }
-  );
+  // Log the beginning of middleware execution with timestamp
+  console.log(`[${new Date().toISOString()}] Middleware executing for path: ${req.nextUrl.pathname}`);
+  
+  // Debug cookie information
+  const cookieStr = req.headers.get('cookie') || '';
+  console.log(`Cookie header: ${cookieStr.substring(0, 100)}${cookieStr.length > 100 ? '...' : ''}`);
+  
+  // Create a Supabase client using the createMiddlewareClient helper
+  // This handles the cookie access properly in the middleware context
+  const supabase = createMiddlewareClient({ req, res });
   
   try {
     // Get the current path
     const path = req.nextUrl.pathname;
-
-    // Log the current path and cookies for debugging
-    console.log(`Middleware processing path: ${path}`);
+    
+    // Log the full URL for debugging
+    console.log(`Full URL: ${req.url}`);
+    
+    // DEBUG: Check all Supabase cookies that might be present
+    const sbAccessToken = req.cookies.get('sb-access-token')?.value;
+    const sbRefreshToken = req.cookies.get('sb-refresh-token')?.value;
+    const sbProvider = req.cookies.get('sb-provider')?.value;
+    
+    console.log(`Auth cookies check: access=${!!sbAccessToken}, refresh=${!!sbRefreshToken}, provider=${sbProvider || 'none'}`);
     
     // Check if the path is a public route that doesn't need authentication checks
     if (publicRoutes.some(route => path === route || path.startsWith(route))) {
@@ -85,14 +66,22 @@ export async function middleware(req: NextRequest) {
     }
     
     // Check if the user is authenticated
+    console.log(`Checking auth session for path: ${path}`);
     const { data: { session }, error } = await supabase.auth.getSession();
+    
+    console.log(`Session check result: ${!!session ? 'Authenticated' : 'Not authenticated'}`);
+    if (session) {
+      console.log(`User ID: ${session.user.id}, Email: ${session.user.email}`);
+    }
     
     if (error) {
       console.error('Error checking authentication:', error);
       // On auth error, redirect to sign-in for protected routes
       if (protectedRoutes.some(route => path.startsWith(route))) {
+        console.error(`Auth error for protected route ${path}, redirecting to sign-in`);
         const redirectUrl = new URL('/sign-in', req.url);
         redirectUrl.searchParams.set('redirect', path);
+        redirectUrl.searchParams.set('error', 'auth_error');
         return NextResponse.redirect(redirectUrl);
       }
     }
@@ -129,6 +118,7 @@ export async function middleware(req: NextRequest) {
       );
     }
     
+    console.log(`Middleware completed for ${path}: allowing access`);
     return res;
   } catch (error) {
     console.error('Middleware error:', error);
