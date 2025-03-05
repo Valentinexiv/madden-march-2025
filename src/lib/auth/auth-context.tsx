@@ -33,13 +33,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const initializeAuth = async () => {
       setIsLoading(true);
       try {
+        console.log('Initializing auth...');
         const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
         setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          console.log('User already authenticated:', session.user.id);
+        } else {
+          console.log('No authenticated user found');
+        }
 
         // Set up auth state change listener
         const { data: { subscription } } = await supabase.auth.onAuthStateChange(
-          (_event, session) => {
+          (event, session) => {
+            console.log('Auth state changed:', event);
             setSession(session);
             setUser(session?.user ?? null);
             setIsLoading(false);
@@ -63,21 +71,45 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Sign in with Discord OAuth
   const signInWithDiscord = async () => {
     try {
-      await supabase.auth.signInWithOAuth({
+      console.log('Initiating Discord sign in...');
+      
+      // This is the URL we want the user to end up at after the entire auth flow
+      const redirectTo = `${window.location.origin}/auth/callback`;
+      console.log('Final redirect URL:', redirectTo);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'discord',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: redirectTo,
           scopes: 'identify email guilds',
+          // Keep PKCE flow type for security
+          flowType: 'pkce',
         },
       });
+      
+      if (error) {
+        console.error('Error initiating Discord sign in:', error);
+        throw error;
+      }
+      
+      // This is Supabase's generated sign-in URL that includes the Supabase callback URL
+      console.log('Discord sign in initiated, redirecting to Supabase auth URL:', data?.url);
     } catch (error) {
       console.error('Error signing in with Discord:', error);
+      throw error;
     }
   };
 
   // Sign out
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      console.log('Signing out user...');
+      await supabase.auth.signOut();
+      console.log('User signed out successfully');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      throw error;
+    }
   };
 
   // Create the context value

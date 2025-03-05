@@ -1,90 +1,151 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/auth-context';
+import Link from 'next/link';
+import { getServerUser } from '@/lib/auth/server-auth';
+import { redirect } from 'next/navigation';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { getCurrentUserLeagues } from '@/lib/actions/league-actions';
+import { FaPlus, FaUsers, FaArrowRight } from 'react-icons/fa';
 
-export default function DashboardPage() {
-  const { user, isLoading } = useAuth();
-  const router = useRouter();
-
-  // Redirect to sign-in if not authenticated
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push('/sign-in');
-    }
-  }, [user, isLoading, router]);
-
-  // Show loading state while checking authentication
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center">
-        <div className="animate-pulse text-center">
-          <h1 className="text-2xl font-bold mb-4">Loading...</h1>
-          <p className="text-gray-500">Please wait while we load your dashboard.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // If not authenticated and not redirected yet, show a message
+export default async function DashboardPage() {
+  const user = await getServerUser();
+  
   if (!user) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Authentication Required</h1>
-          <p className="text-gray-500">You need to be signed in to view this page.</p>
+    redirect('/sign-in');
+  }
+  
+  // Get user's leagues
+  const leagues = await getUserLeagues(user.id);
+  const hasLeagues = leagues && leagues.length > 0;
+  
+  return (
+    <div className="container mx-auto py-6 space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-gray-500">Welcome to your Madden March 2025 dashboard</p>
         </div>
       </div>
-    );
-  }
-
-  // Get user details from metadata if available
-  const discordUsername = user.user_metadata?.full_name || user.user_metadata?.name || user.email;
-  const avatarUrl = user.user_metadata?.avatar_url;
-
-  return (
-    <div className="flex min-h-screen flex-col">
-      <header className="bg-white border-b p-4 shadow-sm">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Madden March Dashboard</h1>
-          <div className="flex items-center gap-2">
-            {avatarUrl && (
-              <img src={avatarUrl} alt="Discord avatar" className="w-8 h-8 rounded-full" />
-            )}
-            <span>{discordUsername}</span>
-          </div>
-        </div>
-      </header>
-
-      <main className="flex-1 container mx-auto p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4">Your Leagues</h2>
-            <p className="text-gray-500">You haven't joined any leagues yet.</p>
-            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-              Create or Join League
-            </button>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-            <p className="text-gray-500">No recent activity to display.</p>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4">Discord Integration</h2>
-            <p className="text-gray-500">Connect your Discord server to enable notifications.</p>
-            <button className="mt-4 px-4 py-2 bg-[#5865F2] text-white rounded hover:bg-[#4752C4]">
-              Connect Discord Server
-            </button>
-          </div>
-        </div>
-      </main>
-
-      <footer className="bg-white border-t p-4 text-center text-gray-500">
-        <p>© 2025 Madden March. All rights reserved.</p>
-      </footer>
+      
+      {!hasLeagues && (
+        <Card className="border-dashed border-2 border-primary/50 bg-primary/5">
+          <CardHeader>
+            <CardTitle>Get Started with Madden March 2025</CardTitle>
+            <CardDescription>
+              It looks like you haven't set up any leagues yet. Let's get you started!
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>
+              Madden March 2025 lets you track and visualize your Madden franchise data. 
+              You can create your own league as a commissioner or join an existing league.
+            </p>
+          </CardContent>
+          <CardFooter className="flex flex-col sm:flex-row gap-4">
+            <Button asChild className="w-full sm:w-auto">
+              <Link href="/onboarding">
+                Go to Onboarding <FaArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full sm:w-auto">
+              <Link href="/dashboard/leagues">
+                View League Management
+              </Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      )}
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader>
+            <CardTitle>Your Leagues</CardTitle>
+            <CardDescription>
+              Manage your Madden leagues
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={<Skeleton className="h-20 w-full" />}>
+              <p className="text-center py-2 text-gray-500">
+                {hasLeagues 
+                  ? `You have ${leagues.length} league${leagues.length === 1 ? '' : 's'}`
+                  : 'No leagues yet'}
+              </p>
+            </Suspense>
+          </CardContent>
+          <CardFooter>
+            <Button asChild className="w-full">
+              <Link href="/dashboard/leagues">
+                View Leagues
+              </Link>
+            </Button>
+          </CardFooter>
+        </Card>
+        
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader>
+            <CardTitle>Create a League</CardTitle>
+            <CardDescription>
+              Start a new Madden league
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-center py-2">
+              <div className="bg-primary/10 p-4 rounded-full">
+                <FaPlus className="h-6 w-6 text-primary" />
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button asChild className="w-full">
+              <Link href="/onboarding?action=create">
+                Create League
+              </Link>
+            </Button>
+          </CardFooter>
+        </Card>
+        
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader>
+            <CardTitle>Join a League</CardTitle>
+            <CardDescription>
+              Join an existing Madden league
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-center py-2">
+              <div className="bg-primary/10 p-4 rounded-full">
+                <FaUsers className="h-6 w-6 text-primary" />
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button asChild className="w-full" variant="outline">
+              <Link href="/onboarding?action=join">
+                Join League
+              </Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
     </div>
   );
+}
+
+async function getUserLeagues(userId: string) {
+  try {
+    const result = await getCurrentUserLeagues(userId);
+    if (result.success) {
+      return result.leagues || [];
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching user leagues:', error);
+    return [];
+  }
 } 

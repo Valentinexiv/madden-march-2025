@@ -13,6 +13,13 @@ export function useDiscordAuth() {
   const handleDiscordSignIn = async () => {
     setIsLoading(true);
     try {
+      // Save the current URL's redirect parameter to localStorage if it exists
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectParam = urlParams.get('redirect');
+      if (redirectParam) {
+        localStorage.setItem('authRedirectUrl', redirectParam);
+      }
+
       await signInWithDiscord();
       // Note: The actual redirect is handled by Supabase OAuth flow
     } catch (err) {

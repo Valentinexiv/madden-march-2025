@@ -26,14 +26,16 @@ import { Loader2 } from 'lucide-react';
 
 interface LeagueFormProps {
   userId: string;
+  onComplete?: (leagueId: string) => void;
 }
 
-export function LeagueForm({ userId }: LeagueFormProps) {
+export function LeagueForm({ userId, onComplete }: LeagueFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [slugCheckLoading, setSlugCheckLoading] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [apiEndpoint, setApiEndpoint] = useState<string | null>(null);
 
   const form = useForm<LeagueCreateInput>({
     resolver: zodResolver(LeagueCreateSchema),
@@ -83,8 +85,19 @@ export function LeagueForm({ userId }: LeagueFormProps) {
           description: `Your league "${data.name}" has been created.`,
         });
         
-        // Redirect to the league dashboard
-        router.push(`/leagues/${result.league.id}`);
+        // Set the API endpoint for display
+        if (result.league.import_url) {
+          setApiEndpoint(result.league.import_url);
+        }
+        
+        // Call the onComplete callback if provided
+        if (onComplete) {
+          onComplete(result.league.id);
+        } else {
+          // Redirect to the league dashboard using window.location.href instead of router.push
+          // This ensures the middleware processes the request properly
+          window.location.href = `/dashboard/leagues/${result.league.id}`;
+        }
       } else {
         toast({
           title: 'Error creating league',
@@ -103,6 +116,42 @@ export function LeagueForm({ userId }: LeagueFormProps) {
       setIsSubmitting(false);
     }
   };
+
+  // If API endpoint is set, show the success view
+  if (apiEndpoint) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-green-600">League Created Successfully!</CardTitle>
+          <CardDescription>
+            Your league has been created. Here's your API endpoint for the Madden Companion App:
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 bg-gray-50 rounded-md border border-gray-200 overflow-x-auto">
+            <code className="text-sm break-all">{apiEndpoint}</code>
+          </div>
+          <p className="mt-4 text-sm text-gray-500">
+            Use this URL in the Madden Companion App to export your league data.
+          </p>
+        </CardContent>
+        <CardFooter>
+          <Button 
+            className="w-full" 
+            onClick={() => {
+              if (onComplete) {
+                onComplete('');
+              } else {
+                router.push('/dashboard/leagues');
+              }
+            }}
+          >
+            Continue to Dashboard
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-2xl mx-auto">

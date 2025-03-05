@@ -80,14 +80,15 @@ export async function createNewLeague(userId: string, data: LeagueCreateInput) {
     
     // Create the league
     const league = await createLeague({
-      user_id: userId,
+      owner: userId,
       name: validatedData.name,
       league_identifier: validatedData.league_identifier,
       platform: validatedData.platform,
       madden_league_id: validatedData.madden_league_id || '',
       discord_server_id: validatedData.discord_server_id || null,
       import_url: null,
-      last_import_at: null
+      last_import_at: null,
+      members: null
     });
     
     // Add the user as a commissioner
@@ -136,7 +137,7 @@ export async function updateExistingLeague(userId: string, leagueId: string, dat
     }
     
     // Check if the user is the owner of the league
-    if (league.user_id !== userId) {
+    if (league.owner !== userId) {
       return { 
         success: false, 
         error: 'You do not have permission to update this league' 
@@ -181,7 +182,7 @@ export async function deleteExistingLeague(userId: string, data: LeagueDeleteInp
     }
     
     // Check if the user is the owner of the league
-    if (league.user_id !== userId) {
+    if (league.owner !== userId) {
       return { 
         success: false, 
         error: 'You do not have permission to delete this league' 
@@ -228,7 +229,7 @@ export async function getCurrentUserLeagues(userId: string) {
     const { data: ownedLeagues, error: ownedError } = await supabaseAdmin
       .from('leagues')
       .select('*')
-      .eq('user_id', userId);
+      .eq('owner', userId);
       
     if (ownedError) {
       throw ownedError;

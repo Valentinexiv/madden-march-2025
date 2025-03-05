@@ -63,7 +63,7 @@ export async function getLeaguesByUserId(userId: string): Promise<League[]> {
   const { data, error } = await supabaseAdmin
     .from('leagues')
     .select('*')
-    .eq('user_id', userId);
+    .eq('owner', userId);
   
   if (error) {
     throw error;
@@ -175,7 +175,7 @@ export async function userHasLeagueAccess(userId: string, leagueId: string): Pro
     .from('leagues')
     .select('id')
     .eq('id', leagueId)
-    .eq('user_id', userId)
+    .eq('owner', userId)
     .single();
   
   if (league) {
@@ -184,7 +184,7 @@ export async function userHasLeagueAccess(userId: string, leagueId: string): Pro
   
   // Check if user is a member of the league
   const { data: member, error: memberError } = await supabaseAdmin
-    .from('league_members')
+    .from('league_memberships')
     .select('league_id')
     .eq('league_id', leagueId)
     .eq('user_id', userId)
@@ -240,7 +240,7 @@ export async function isLeagueIdentifierAvailable(identifier: string): Promise<b
  */
 export async function getLeagueMembers(leagueId: string): Promise<any[]> {
   const { data, error } = await supabaseAdmin
-    .from('league_members')
+    .from('league_memberships')
     .select(`
       *,
       users:user_id (
@@ -268,7 +268,7 @@ export async function getLeagueMembers(leagueId: string): Promise<any[]> {
  */
 export async function addLeagueMember(leagueId: string, userId: string, role: string): Promise<any> {
   const { data, error } = await supabaseAdmin
-    .from('league_members')
+    .from('league_memberships')
     .insert({
       league_id: leagueId,
       user_id: userId,
@@ -293,7 +293,7 @@ export async function addLeagueMember(leagueId: string, userId: string, role: st
  */
 export async function removeLeagueMember(leagueId: string, userId: string): Promise<boolean> {
   const { error } = await supabaseAdmin
-    .from('league_members')
+    .from('league_memberships')
     .delete()
     .eq('league_id', leagueId)
     .eq('user_id', userId);
@@ -315,7 +315,7 @@ export async function removeLeagueMember(leagueId: string, userId: string): Prom
  */
 export async function updateLeagueMemberRole(leagueId: string, userId: string, role: string): Promise<any> {
   const { data, error } = await supabaseAdmin
-    .from('league_members')
+    .from('league_memberships')
     .update({ role })
     .eq('league_id', leagueId)
     .eq('user_id', userId)
@@ -340,7 +340,7 @@ export async function getLeaguesMembershipsByUserId(userId: string): Promise<Arr
   role: string;
 }>> {
   const { data, error } = await supabaseAdmin
-    .from('league_members')
+    .from('league_memberships')
     .select(`
       role,
       leagues:league_id (*)
@@ -356,4 +356,4 @@ export async function getLeaguesMembershipsByUserId(userId: string): Promise<Arr
     league: item.leagues as League,
     role: item.role
   }));
-} 
+}
