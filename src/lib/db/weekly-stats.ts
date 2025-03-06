@@ -415,20 +415,45 @@ export async function upsertDefensiveStatsByWeek(
   weekIndex: number,
   seasonIndex: number
 ): Promise<WeeklyDefensiveStat[]> {
-  // First, delete existing stats for this week/season
-  await deleteDefensiveStatsByWeek(leagueId, weekIndex, seasonIndex);
-  
-  // Then, insert the new stats
-  const { data, error } = await supabaseAdmin
-    .from('weekly_defensive_stats')
-    .insert(stats)
-    .select();
-  
-  if (error) {
-    throw error;
+  if (stats.length === 0) {
+    return [];
   }
   
-  return data as WeeklyDefensiveStat[];
+  try {
+    // Use upsert with onConflict referring to the unique constraint
+    const { data, error } = await supabaseAdmin
+      .from('weekly_defensive_stats')
+      .upsert(stats, {
+        onConflict: 'league_id,stat_id,week_index,season_index',
+        ignoreDuplicates: false
+      })
+      .select();
+    
+    if (error) {
+      console.error('Error upserting defensive stats:', error);
+      
+      // Fall back to delete-then-insert if there's an error with the constraint
+      if (error.code === '42P10') {
+        console.log('Falling back to delete-then-insert for defensive stats');
+        await deleteDefensiveStatsByWeek(leagueId, weekIndex, seasonIndex);
+        
+        const { data: insertData, error: insertError } = await supabaseAdmin
+          .from('weekly_defensive_stats')
+          .insert(stats)
+          .select();
+          
+        if (insertError) throw insertError;
+        return insertData as WeeklyDefensiveStat[];
+      }
+      
+      throw error;
+    }
+    
+    return data as WeeklyDefensiveStat[];
+  } catch (error) {
+    console.error('Error in upsertDefensiveStatsByWeek:', error);
+    throw error;
+  }
 }
 
 /**
@@ -446,20 +471,45 @@ export async function upsertReceivingStatsByWeek(
   weekIndex: number,
   seasonIndex: number
 ): Promise<WeeklyReceivingStat[]> {
-  // First, delete existing stats for this week/season
-  await deleteReceivingStatsByWeek(leagueId, weekIndex, seasonIndex);
-  
-  // Then, insert the new stats
-  const { data, error } = await supabaseAdmin
-    .from('weekly_receiving_stats')
-    .insert(stats)
-    .select();
-  
-  if (error) {
-    throw error;
+  if (stats.length === 0) {
+    return [];
   }
   
-  return data as WeeklyReceivingStat[];
+  try {
+    // Use upsert with onConflict referring to the unique constraint
+    const { data, error } = await supabaseAdmin
+      .from('weekly_receiving_stats')
+      .upsert(stats, {
+        onConflict: 'league_id,stat_id,week_index,season_index',
+        ignoreDuplicates: false
+      })
+      .select();
+    
+    if (error) {
+      console.error('Error upserting receiving stats:', error);
+      
+      // Fall back to delete-then-insert if there's an error with the constraint
+      if (error.code === '42P10') {
+        console.log('Falling back to delete-then-insert for receiving stats');
+        await deleteReceivingStatsByWeek(leagueId, weekIndex, seasonIndex);
+        
+        const { data: insertData, error: insertError } = await supabaseAdmin
+          .from('weekly_receiving_stats')
+          .insert(stats)
+          .select();
+          
+        if (insertError) throw insertError;
+        return insertData as WeeklyReceivingStat[];
+      }
+      
+      throw error;
+    }
+    
+    return data as WeeklyReceivingStat[];
+  } catch (error) {
+    console.error('Error in upsertReceivingStatsByWeek:', error);
+    throw error;
+  }
 }
 
 /**
@@ -477,20 +527,45 @@ export async function upsertRushingStatsByWeek(
   weekIndex: number,
   seasonIndex: number
 ): Promise<WeeklyRushingStat[]> {
-  // First, delete existing stats for this week/season
-  await deleteRushingStatsByWeek(leagueId, weekIndex, seasonIndex);
-  
-  // Then, insert the new stats
-  const { data, error } = await supabaseAdmin
-    .from('weekly_rushing_stats')
-    .insert(stats)
-    .select();
-  
-  if (error) {
-    throw error;
+  if (stats.length === 0) {
+    return [];
   }
   
-  return data as WeeklyRushingStat[];
+  try {
+    // Use upsert with onConflict referring to the unique constraint
+    const { data, error } = await supabaseAdmin
+      .from('weekly_rushing_stats')
+      .upsert(stats, {
+        onConflict: 'league_id,stat_id,week_index,season_index',
+        ignoreDuplicates: false
+      })
+      .select();
+    
+    if (error) {
+      console.error('Error upserting rushing stats:', error);
+      
+      // Fall back to delete-then-insert if there's an error with the constraint
+      if (error.code === '42P10') {
+        console.log('Falling back to delete-then-insert for rushing stats');
+        await deleteRushingStatsByWeek(leagueId, weekIndex, seasonIndex);
+        
+        const { data: insertData, error: insertError } = await supabaseAdmin
+          .from('weekly_rushing_stats')
+          .insert(stats)
+          .select();
+          
+        if (insertError) throw insertError;
+        return insertData as WeeklyRushingStat[];
+      }
+      
+      throw error;
+    }
+    
+    return data as WeeklyRushingStat[];
+  } catch (error) {
+    console.error('Error in upsertRushingStatsByWeek:', error);
+    throw error;
+  }
 }
 
 /**
@@ -508,20 +583,45 @@ export async function upsertPassingStatsByWeek(
   weekIndex: number,
   seasonIndex: number
 ): Promise<WeeklyPassingStat[]> {
-  // First, delete existing stats for this week/season
-  await deletePassingStatsByWeek(leagueId, weekIndex, seasonIndex);
-  
-  // Then, insert the new stats
-  const { data, error } = await supabaseAdmin
-    .from('weekly_passing_stats')
-    .insert(stats)
-    .select();
-  
-  if (error) {
-    throw error;
+  if (stats.length === 0) {
+    return [];
   }
   
-  return data as WeeklyPassingStat[];
+  try {
+    // Use upsert with onConflict referring to the unique constraint
+    const { data, error } = await supabaseAdmin
+      .from('weekly_passing_stats')
+      .upsert(stats, {
+        onConflict: 'league_id,stat_id,week_index,season_index',
+        ignoreDuplicates: false
+      })
+      .select();
+    
+    if (error) {
+      console.error('Error upserting passing stats:', error);
+      
+      // Fall back to delete-then-insert if there's an error with the constraint
+      if (error.code === '42P10') {
+        console.log('Falling back to delete-then-insert for passing stats');
+        await deletePassingStatsByWeek(leagueId, weekIndex, seasonIndex);
+        
+        const { data: insertData, error: insertError } = await supabaseAdmin
+          .from('weekly_passing_stats')
+          .insert(stats)
+          .select();
+          
+        if (insertError) throw insertError;
+        return insertData as WeeklyPassingStat[];
+      }
+      
+      throw error;
+    }
+    
+    return data as WeeklyPassingStat[];
+  } catch (error) {
+    console.error('Error in upsertPassingStatsByWeek:', error);
+    throw error;
+  }
 }
 
 /**
@@ -539,20 +639,45 @@ export async function upsertKickingStatsByWeek(
   weekIndex: number,
   seasonIndex: number
 ): Promise<WeeklyKickingStat[]> {
-  // First, delete existing stats for this week/season
-  await deleteKickingStatsByWeek(leagueId, weekIndex, seasonIndex);
-  
-  // Then, insert the new stats
-  const { data, error } = await supabaseAdmin
-    .from('weekly_kicking_stats')
-    .insert(stats)
-    .select();
-  
-  if (error) {
-    throw error;
+  if (stats.length === 0) {
+    return [];
   }
   
-  return data as WeeklyKickingStat[];
+  try {
+    // Use upsert with onConflict referring to the unique constraint
+    const { data, error } = await supabaseAdmin
+      .from('weekly_kicking_stats')
+      .upsert(stats, {
+        onConflict: 'league_id,stat_id,week_index,season_index',
+        ignoreDuplicates: false
+      })
+      .select();
+    
+    if (error) {
+      console.error('Error upserting kicking stats:', error);
+      
+      // Fall back to delete-then-insert if there's an error with the constraint
+      if (error.code === '42P10') {
+        console.log('Falling back to delete-then-insert for kicking stats');
+        await deleteKickingStatsByWeek(leagueId, weekIndex, seasonIndex);
+        
+        const { data: insertData, error: insertError } = await supabaseAdmin
+          .from('weekly_kicking_stats')
+          .insert(stats)
+          .select();
+          
+        if (insertError) throw insertError;
+        return insertData as WeeklyKickingStat[];
+      }
+      
+      throw error;
+    }
+    
+    return data as WeeklyKickingStat[];
+  } catch (error) {
+    console.error('Error in upsertKickingStatsByWeek:', error);
+    throw error;
+  }
 }
 
 /**
@@ -570,20 +695,45 @@ export async function upsertPuntingStatsByWeek(
   weekIndex: number,
   seasonIndex: number
 ): Promise<WeeklyPuntingStat[]> {
-  // First, delete existing stats for this week/season
-  await deletePuntingStatsByWeek(leagueId, weekIndex, seasonIndex);
-  
-  // Then, insert the new stats
-  const { data, error } = await supabaseAdmin
-    .from('weekly_punting_stats')
-    .insert(stats)
-    .select();
-  
-  if (error) {
-    throw error;
+  if (stats.length === 0) {
+    return [];
   }
   
-  return data as WeeklyPuntingStat[];
+  try {
+    // Use upsert with onConflict referring to the unique constraint
+    const { data, error } = await supabaseAdmin
+      .from('weekly_punting_stats')
+      .upsert(stats, {
+        onConflict: 'league_id,stat_id,week_index,season_index',
+        ignoreDuplicates: false
+      })
+      .select();
+    
+    if (error) {
+      console.error('Error upserting punting stats:', error);
+      
+      // Fall back to delete-then-insert if there's an error with the constraint
+      if (error.code === '42P10') {
+        console.log('Falling back to delete-then-insert for punting stats');
+        await deletePuntingStatsByWeek(leagueId, weekIndex, seasonIndex);
+        
+        const { data: insertData, error: insertError } = await supabaseAdmin
+          .from('weekly_punting_stats')
+          .insert(stats)
+          .select();
+          
+        if (insertError) throw insertError;
+        return insertData as WeeklyPuntingStat[];
+      }
+      
+      throw error;
+    }
+    
+    return data as WeeklyPuntingStat[];
+  } catch (error) {
+    console.error('Error in upsertPuntingStatsByWeek:', error);
+    throw error;
+  }
 }
 
 /**
@@ -601,18 +751,43 @@ export async function upsertTeamStatsByWeek(
   weekIndex: number,
   seasonIndex: number
 ): Promise<WeeklyTeamStat[]> {
-  // First, delete existing stats for this week/season
-  await deleteTeamStatsByWeek(leagueId, weekIndex, seasonIndex);
-  
-  // Then, insert the new stats
-  const { data, error } = await supabaseAdmin
-    .from('weekly_team_stats')
-    .insert(stats)
-    .select();
-  
-  if (error) {
-    throw error;
+  if (stats.length === 0) {
+    return [];
   }
   
-  return data as WeeklyTeamStat[];
+  try {
+    // Use upsert with onConflict referring to the unique constraint
+    const { data, error } = await supabaseAdmin
+      .from('weekly_team_stats')
+      .upsert(stats, {
+        onConflict: 'league_id,stat_id,week_index,season_index',
+        ignoreDuplicates: false
+      })
+      .select();
+    
+    if (error) {
+      console.error('Error upserting team stats:', error);
+      
+      // Fall back to delete-then-insert if there's an error with the constraint
+      if (error.code === '42P10') {
+        console.log('Falling back to delete-then-insert for team stats');
+        await deleteTeamStatsByWeek(leagueId, weekIndex, seasonIndex);
+        
+        const { data: insertData, error: insertError } = await supabaseAdmin
+          .from('weekly_team_stats')
+          .insert(stats)
+          .select();
+          
+        if (insertError) throw insertError;
+        return insertData as WeeklyTeamStat[];
+      }
+      
+      throw error;
+    }
+    
+    return data as WeeklyTeamStat[];
+  } catch (error) {
+    console.error('Error in upsertTeamStatsByWeek:', error);
+    throw error;
+  }
 } 
