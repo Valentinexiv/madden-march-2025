@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Navbar } from '@/components/layout/navbar';
 import { Sidebar } from '@/components/layout/sidebar';
 import { useAuth } from '@/lib/auth/auth-context';
-import { useRequireAuth } from '@/lib/auth/hooks';
 import { cn } from '@/lib/utils';
 
 interface DashboardLayoutProps {
@@ -14,15 +13,21 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
   const pathname = usePathname();
   
-  // Require authentication for all dashboard pages
-  const { user, isLoading } = useRequireAuth('/sign-in');
-
   // Prevent hydration errors by only rendering after mount
   useEffect(() => {
     setIsMounted(true);
   }, []);
+  
+  // Redirect to sign-in if not authenticated
+  useEffect(() => {
+    if (isMounted && !isLoading && !user) {
+      router.push('/sign-in');
+    }
+  }, [isMounted, isLoading, user, router]);
 
   // Show loading state while checking authentication
   if (!isMounted || isLoading) {
@@ -36,7 +41,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     );
   }
 
-  // If not authenticated, the useRequireAuth hook will redirect to sign-in
+  // If not authenticated, return null (will be redirected by the effect)
   if (!user) {
     return null;
   }

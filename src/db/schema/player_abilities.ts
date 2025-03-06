@@ -2,18 +2,20 @@
 export interface PlayerAbility {
     id: string; // UUID
     player_id: string; // UUID foreign key to players.id
-    league_id: string; // UUID foreign key to leagues.id
+    slot_id: string; // UUID foreign key to player_ability_slots.id
     
-    signature_title: string | null;
-    signature_description: string | null;
-    signature_logo_id: number | null;
-    signature_activation_description: string | null;
-    signature_deactivation_description: string | null;
+    ability_title: string | null;
+    ability_description: string | null;
+    ability_logo_id: number | null;
     ability_rank: string | null;
+    
     is_passive: boolean | null;
     is_unlocked: boolean | null;
-    market_ability_alias: string | null;
     
-    created_at: Date;
+    unlock_requirement: string | null;
+    activation_description: string | null;
+    deactivation_description: string | null;
+    
+    created_at: Date | null;
     updated_at: Date | null;
   }

@@ -1,8 +1,8 @@
 // File: src/db/schema/standings.ts
 export interface Standing {
-  id: number; // Serial
-  league_id: string; // UUID foreign key to leagues.id
-  team_id: string | null; // UUID foreign key to teams.id
+  id: string; // UUID
+  league_id: string | null; // UUID foreign key to leagues.id
+  team_id: string | null; // Foreign key to teams.team_id
   week_index: number | null;
   season_index: number | null;
   stage_index: number | null;
@@ -33,17 +33,27 @@ export interface Standing {
   pts_against_rank: number | null;
   off_total_yds: number | null;
   off_total_yds_rank: number | null;
+  off_pass_yds: number | null;
+  off_pass_yds_rank: number | null;
+  off_rush_yds: number | null;
+  off_rush_yds_rank: number | null;
   def_total_yds: number | null;
   def_total_yds_rank: number | null;
-  win_loss_streak: number | null;
-  div_name: string | null;
+  def_pass_yds: number | null;
+  def_pass_yds_rank: number | null;
+  def_rush_yds: number | null;
+  def_rush_yds_rank: number | null;
+  to_diff: number | null;
   division_id: string | null;
+  division_name: string | null;
   conference_id: string | null;
   conference_name: string | null;
   playoff_status: number | null;
+  win_loss_streak: number | null;
   cap_available: number | null;
   cap_spent: number | null;
   cap_room: number | null;
   team_ovr: number | null;
-  created_at: Date;
+  created_at: Date | null;
+  updated_at: Date | null;
 }

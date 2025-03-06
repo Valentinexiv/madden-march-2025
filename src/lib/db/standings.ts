@@ -182,4 +182,32 @@ export async function upsertStandingsByWeek(
   }
   
   return data as Standing[];
+}
+
+/**
+ * Upsert standings for a specific league
+ * This is a simplified version that just inserts the standings without checking for existing ones
+ * 
+ * @param standings - Array of standing data to insert
+ * @returns Array of created standings
+ */
+export async function upsertStandings(
+  standings: Omit<Standing, 'id' | 'created_at'>[]
+): Promise<Standing[]> {
+  if (standings.length === 0) {
+    return [];
+  }
+  
+  const { data, error } = await supabaseAdmin
+    .from('standings')
+    .upsert(standings, {
+      onConflict: 'league_id,team_id,week_index,season_index'
+    })
+    .select();
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data as Standing[];
 } 

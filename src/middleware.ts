@@ -8,7 +8,7 @@ const protectedRoutes = [
   '/leagues',
   '/profile',
   '/settings',
-  '/api/leagues', // Protect API routes for leagues
+  // '/api/leagues', // Commenting out to allow Madden Companion app access
 ];
 
 // Define routes that should redirect to dashboard if already authenticated
@@ -28,6 +28,8 @@ const publicRoutes = [
   '/auth/callback', // Auth callback should always be accessible
   '/.well-known/oauth-callback', // OAuth well-known URL
   '/onboarding', // Add onboarding to public routes - we'll handle auth inside the page
+  '/api/leagues', // Allow access to league API routes for the Madden Companion app
+  '/api/debug', // Allow access to debug endpoints
 ];
 
 export async function middleware(req: NextRequest) {

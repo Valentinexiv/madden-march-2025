@@ -8,7 +8,7 @@ import {
   LayoutDashboard,
   Trophy,
   Users,
-  UserRound,
+  User,
   BarChart3,
   Settings,
   Bell,
@@ -54,7 +54,7 @@ const sidebarNavItems: SidebarNavItem[] = [
   {
     title: 'Players',
     href: '/players',
-    icon: <UserRound className="h-5 w-5" />,
+    icon: <User className="h-5 w-5" />,
   },
   {
     title: 'Statistics',

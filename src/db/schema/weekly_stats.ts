@@ -1,14 +1,14 @@
 // File: src/db/schema/weekly_stats.ts
 export interface WeeklyDefensiveStat {
-  id: number; // Serial
-  league_id: string; // UUID foreign key to leagues.id
+  id: string; // UUID
+  league_id: string | null; // UUID foreign key to leagues.id
   player_id: string | null; // UUID foreign key to players.id
+  team_id: string | null; // team_id from teams table
   stat_id: string | null;
   schedule_id: string | null;
   week_index: number | null;
   season_index: number | null;
   stage_index: number | null;
-  team_id: string | null;
   def_total_tackles: number | null;
   def_sacks: number | null;
   def_ints: number | null;
@@ -20,19 +20,20 @@ export interface WeeklyDefensiveStat {
   def_int_return_yds: number | null;
   def_catch_allowed: number | null;
   def_pts: number | null;
-  created_at: Date;
+  created_at: Date | null;
+  updated_at: Date | null;
 }
 
 export interface WeeklyReceivingStat {
-  id: number; // Serial
-  league_id: string; // UUID foreign key to leagues.id
+  id: string; // UUID
+  league_id: string | null; // UUID foreign key to leagues.id
   player_id: string | null; // UUID foreign key to players.id
+  team_id: string | null; // team_id from teams table
   stat_id: string | null;
   schedule_id: string | null;
   week_index: number | null;
   season_index: number | null;
   stage_index: number | null;
-  team_id: string | null;
   rec_catches: number | null;
   rec_yards: number | null;
   rec_tds: number | null;
@@ -45,19 +46,20 @@ export interface WeeklyReceivingStat {
   rec_yards_per_game: number | null;
   rec_to_pct: number | null;
   rec_pts: number | null;
-  created_at: Date;
+  created_at: Date | null;
+  updated_at: Date | null;
 }
 
 export interface WeeklyRushingStat {
-  id: number; // Serial
-  league_id: string; // UUID foreign key to leagues.id
+  id: string; // UUID
+  league_id: string | null; // UUID foreign key to leagues.id
   player_id: string | null; // UUID foreign key to players.id
+  team_id: string | null; // team_id from teams table
   stat_id: string | null;
   schedule_id: string | null;
   week_index: number | null;
   season_index: number | null;
   stage_index: number | null;
-  team_id: string | null;
   rush_att: number | null;
   rush_yards: number | null;
   rush_tds: number | null;
@@ -70,19 +72,20 @@ export interface WeeklyRushingStat {
   rush_yards_per_game: number | null;
   rush_to_pct: number | null;
   rush_pts: number | null;
-  created_at: Date;
+  created_at: Date | null;
+  updated_at: Date | null;
 }
 
 export interface WeeklyPassingStat {
-  id: number; // Serial
-  league_id: string; // UUID foreign key to leagues.id
+  id: string; // UUID
+  league_id: string | null; // UUID foreign key to leagues.id
   player_id: string | null; // UUID foreign key to players.id
+  team_id: string | null; // team_id from teams table
   stat_id: string | null;
   schedule_id: string | null;
   week_index: number | null;
   season_index: number | null;
   stage_index: number | null;
-  team_id: string | null;
   pass_att: number | null;
   pass_comp: number | null;
   pass_yards: number | null;
@@ -95,19 +98,20 @@ export interface WeeklyPassingStat {
   pass_yards_per_att: number | null;
   pass_yards_per_game: number | null;
   pass_pts: number | null;
-  created_at: Date;
+  created_at: Date | null;
+  updated_at: Date | null;
 }
 
 export interface WeeklyKickingStat {
-  id: number; // Serial
-  league_id: string; // UUID foreign key to leagues.id
+  id: string; // UUID
+  league_id: string | null; // UUID foreign key to leagues.id
   player_id: string | null; // UUID foreign key to players.id
+  team_id: string | null; // team_id from teams table
   stat_id: string | null;
   schedule_id: string | null;
   week_index: number | null;
   season_index: number | null;
   stage_index: number | null;
-  team_id: string | null;
   fg_att: number | null;
   fg_made: number | null;
   fg_longest: number | null;
@@ -120,19 +124,20 @@ export interface WeeklyKickingStat {
   fg_comp_pct: number | null;
   xp_comp_pct: number | null;
   kick_pts: number | null;
-  created_at: Date;
+  created_at: Date | null;
+  updated_at: Date | null;
 }
 
 export interface WeeklyPuntingStat {
-  id: number; // Serial
-  league_id: string; // UUID foreign key to leagues.id
+  id: string; // UUID
+  league_id: string | null; // UUID foreign key to leagues.id
   player_id: string | null; // UUID foreign key to players.id
+  team_id: string | null; // team_id from teams table
   stat_id: string | null;
   schedule_id: string | null;
   week_index: number | null;
   season_index: number | null;
   stage_index: number | null;
-  team_id: string | null;
   punt_att: number | null;
   punt_yards: number | null;
   punt_longest: number | null;
@@ -142,13 +147,14 @@ export interface WeeklyPuntingStat {
   punt_net_yards: number | null;
   punt_net_yards_per_att: number | null;
   punt_yards_per_att: number | null;
-  created_at: Date;
+  created_at: Date | null;
+  updated_at: Date | null;
 }
 
 export interface WeeklyTeamStat {
-  id: number; // Serial
-  league_id: string; // UUID foreign key to leagues.id
-  team_id: string | null; // UUID foreign key to teams.id
+  id: string; // UUID
+  league_id: string | null; // UUID foreign key to leagues.id
+  team_id: string | null; // team_id from teams table
   stat_id: string | null;
   schedule_id: string | null;
   week_index: number | null;
@@ -188,5 +194,6 @@ export interface WeeklyTeamStat {
   to_giveaways: number | null;
   to_takeaways: number | null;
   to_diff: number | null;
-  created_at: Date;
+  created_at: Date | null;
+  updated_at: Date | null;
 }

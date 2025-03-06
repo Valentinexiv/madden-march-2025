@@ -6,10 +6,10 @@ export interface PlayerAbilitySlot {
     ability_id: string | null; // UUID foreign key to player_abilities.id
     
     slot_index: number | null;
-    locked: boolean | null;
     ovr_threshold: number | null;
+    is_locked: boolean | null;
     is_empty: boolean | null;
     
-    created_at: Date;
+    created_at: Date | null;
     updated_at: Date | null;
   }

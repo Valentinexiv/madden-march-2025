@@ -1,8 +1,4 @@
-'use client';
-
-import { useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth/auth-context';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { getServerUser } from '@/lib/auth/server-auth';
 import { redirect } from 'next/navigation';
@@ -20,7 +16,8 @@ export default async function DashboardPage() {
   }
   
   // Get user's leagues
-  const leagues = await getUserLeagues(user.id);
+  const leaguesResult = await getCurrentUserLeagues(user.id);
+  const leagues = leaguesResult.success ? leaguesResult.leagues?.all || [] : [];
   const hasLeagues = leagues && leagues.length > 0;
   
   return (
@@ -137,15 +134,4 @@ export default async function DashboardPage() {
   );
 }
 
-async function getUserLeagues(userId: string) {
-  try {
-    const result = await getCurrentUserLeagues(userId);
-    if (result.success) {
-      return result.leagues || [];
-    }
-    return [];
-  } catch (error) {
-    console.error('Error fetching user leagues:', error);
-    return [];
-  }
-} 
+ 
